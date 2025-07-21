@@ -1,0 +1,4 @@
+<Files "service-worker.js">
+  Header set Cache-Control "no-cache"
+  Header set Content-Type "application/javascript"
+</Files> 
