@@ -135,13 +135,22 @@ function render() {
   };
   app.appendChild(cog);
 
-  // Date switcher UI
+  // Top bar for date and water intake
+  const topBar = document.createElement('div');
+  topBar.style.display = 'flex';
+  topBar.style.alignItems = 'center';
+  topBar.style.justifyContent = 'space-between';
+  topBar.style.padding = '8px 16px';
+  topBar.style.background = '#f5f7fa';
+  topBar.style.borderRadius = '12px';
+  topBar.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
+  topBar.style.marginBottom = '16px';
+
+  // Date switcher
   const dateWrap = document.createElement('div');
   dateWrap.style.display = 'flex';
   dateWrap.style.alignItems = 'center';
-  dateWrap.style.justifyContent = 'center';
   dateWrap.style.gap = '12px';
-  dateWrap.style.margin = '8px 0 16px 0';
 
   const prevBtn = document.createElement('button');
   prevBtn.textContent = '←';
@@ -173,16 +182,15 @@ function render() {
   };
   dateWrap.appendChild(nextBtn);
 
-  app.appendChild(dateWrap);
+  topBar.appendChild(dateWrap);
 
-  // Water intake controls (per day)
+  // Water intake controls
   const dayData = getDayData(selectedDate);
   const waterWrap = document.createElement('div');
   waterWrap.style.display = 'flex';
   waterWrap.style.alignItems = 'center';
   waterWrap.style.gap = '6px';
-  waterWrap.style.margin = '8px 0 12px 0';
-  waterWrap.style.paddingLeft = '16px';
+  waterWrap.style.paddingLeft = '0';
 
   const waterBtn = WaterButton({
     onAdd: () => {
@@ -215,7 +223,9 @@ function render() {
   mlLabel.style.fontSize = '0.9rem';
   waterWrap.appendChild(mlLabel);
 
-  app.appendChild(waterWrap);
+  topBar.appendChild(waterWrap);
+
+  app.appendChild(topBar);
 
   // Visually delimited tab area
   const tabArea = document.createElement('div');
