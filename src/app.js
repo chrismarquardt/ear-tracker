@@ -118,23 +118,6 @@ function render() {
   const app = document.getElementById('app');
   app.innerHTML = '';
 
-  // Cogwheel button (top right)
-  const cog = document.createElement('button');
-  cog.innerHTML = '⚙️';
-  cog.title = 'Settings';
-  cog.style.position = 'absolute';
-  cog.style.top = '12px';
-  cog.style.right = '16px';
-  cog.style.background = 'none';
-  cog.style.border = 'none';
-  cog.style.fontSize = '1.6rem';
-  cog.style.cursor = 'pointer';
-  cog.onclick = () => {
-    settingsOpen = true;
-    render();
-  };
-  app.appendChild(cog);
-
   // Top bar for date and water intake
   const topBar = document.createElement('div');
   topBar.style.display = 'flex';
@@ -167,7 +150,7 @@ function render() {
   const dateLabel = document.createElement('span');
   dateLabel.textContent = selectedDate;
   dateLabel.style.fontWeight = 'bold';
-  dateLabel.style.fontSize = '1.1rem';
+  dateLabel.style.fontSize = '0.95rem';
   dateWrap.appendChild(dateLabel);
 
   const nextBtn = document.createElement('button');
@@ -199,8 +182,8 @@ function render() {
       render();
     }
   });
-  waterBtn.style.width = '90px';
-  waterBtn.style.padding = '10px 0';
+  waterBtn.style.width = '80px';
+  waterBtn.style.padding = '8px 0';
   waterWrap.appendChild(waterBtn);
 
   const waterInput = document.createElement('input');
@@ -208,8 +191,8 @@ function render() {
   waterInput.min = '0';
   waterInput.step = '50';
   waterInput.value = dayData.waterSum;
-  waterInput.style.flex = '0 0 60px';
-  waterInput.style.fontSize = '1rem';
+  waterInput.style.flex = '0 0 50px';
+  waterInput.style.fontSize = '0.9rem';
   waterInput.style.textAlign = 'right';
   waterInput.onfocus = () => waterInput.select();
   waterInput.onchange = (e) => {
@@ -220,7 +203,8 @@ function render() {
   waterWrap.appendChild(waterInput);
   const mlLabel = document.createElement('span');
   mlLabel.textContent = 'ml';
-  mlLabel.style.fontSize = '0.9rem';
+  mlLabel.style.fontSize = '0.8rem';
+  mlLabel.style.marginLeft = '2px';
   waterWrap.appendChild(mlLabel);
 
   topBar.appendChild(waterWrap);
@@ -353,6 +337,21 @@ function render() {
   // Debug panel (always visible, updates live)
   const debug = DebugPanel({ storageKey: STORAGE_KEY, activeTab: currentTab });
   app.appendChild(debug);
+
+  // Cogwheel button at bottom
+  const cog = document.createElement('button');
+  cog.innerHTML = '⚙️';
+  cog.title = 'Settings';
+  cog.style.background = 'none';
+  cog.style.border = 'none';
+  cog.style.fontSize = '1.6rem';
+  cog.style.cursor = 'pointer';
+  cog.style.margin = '12px auto';
+  cog.onclick = () => {
+    settingsOpen = true;
+    render();
+  };
+  app.appendChild(cog);
 
   // Settings modal
   const modal = SettingsModal({
