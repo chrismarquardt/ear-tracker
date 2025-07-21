@@ -56,8 +56,8 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Test: Debug panel updates live as data changes
 
 ## 9. PWA Features
-- [ ] Implement asset caching in `service-worker.js` for offline use
-- [ ] Test: App loads offline after first visit; can be added to home screen and launches standalone
+- [x] Implement asset caching in `service-worker.js` for offline use
+- [x] Test: App loads offline after first visit; can be added to home screen and launches standalone
 
 ## 10. Polish & Review
 - [ ] Review UI for mobile usability
