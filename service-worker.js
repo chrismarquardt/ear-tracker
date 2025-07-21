@@ -36,16 +36,20 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  // For navigation requests, serve cached index.html (app shell)
-  if (event.request.mode === 'navigate') {
+  const accept = event.request.headers.get('Accept') || '';
+  const isHTML = accept.includes('text/html');
+  const shellUrl = BASE + 'index.html';
+
+  // Navigation or HTML request: try network, fallback to cached shell
+  if (event.request.mode === 'navigate' || isHTML) {
     event.respondWith(
-      caches.match(BASE + 'index.html').then(resp => resp || fetch(event.request))
+      fetch(event.request).catch(() => caches.match(shellUrl))
     );
     return;
   }
 
-  // For other assets: cache-first, then network
+  // Non-HTML: cache-first, then network
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    caches.match(event.request).then(resp => resp || fetch(event.request))
   );
 });
