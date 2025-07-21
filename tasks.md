@@ -14,9 +14,9 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Test: App loads without errors and displays placeholder
 
 ## 2. State & Storage Core
-- [ ] Implement `storage.js` with functions: `loadData()`, `saveData(data)`, `exportData()`, `importData(json)`
-- [ ] In `app.js`, load state from storage on startup
-- [ ] Write tests to verify data can be saved, loaded, exported, and imported from localStorage
+- [x] Implement `storage.js` with functions: `loadData()`, `saveData(data)`, `exportData()`, `importData(json)`
+- [x] In `app.js`, load state from storage on startup
+- [x] Write tests to verify data can be saved, loaded, exported, and imported from localStorage
 
 ## 3. Tab Navigation & Tracker Rows
 - [ ] Implement `Tabs.js` to render tabs for morning, noon, evening, night, with event listeners to switch active tab
