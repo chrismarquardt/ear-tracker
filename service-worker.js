@@ -1,28 +1,27 @@
 console.log('Service Worker: script loaded');
-const CACHE_NAME = 'ear-tracker-v1';
+const CACHE_NAME = 'ear-tracker-v2';
+const BASE = (self.location.pathname.replace(/\/[^\/]*$/, '') || '/') + (self.location.pathname.endsWith('/') ? '' : '/');
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon.png',
-  '/favicon.ico',
-  '/src/app.js',
-  '/src/storage.js',
-  '/src/ui.js',
-  '/src/styles.css',
-  '/src/components/Tabs.js',
-  '/src/components/TrackerRow.js',
-  '/src/components/WaterButton.js',
-  '/src/components/SettingsModal.js',
-  '/src/components/DebugPanel.js'
+  BASE,
+  BASE + 'index.html',
+  BASE + 'manifest.json',
+  BASE + 'icon.png',
+  BASE + 'favicon.ico',
+  BASE + 'src/app.js',
+  BASE + 'src/storage.js',
+  BASE + 'src/styles.css',
+  BASE + 'src/components/Tabs.js',
+  BASE + 'src/components/TrackerRow.js',
+  BASE + 'src/components/WaterButton.js',
+  BASE + 'src/components/SettingsModal.js',
+  BASE + 'src/components/DebugPanel.js'
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
-  console.log('Service Worker: install event');
 });
 
 self.addEventListener('activate', event => {
@@ -32,17 +31,11 @@ self.addEventListener('activate', event => {
     )
   );
   self.clients.claim();
-  console.log('Service Worker: activate event');
 });
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  if (event.request && event.request.url) {
-    console.log('Service Worker: fetch', event.request.url);
-  }
   event.respondWith(
-    caches.match(event.request).then(response =>
-      response || fetch(event.request)
-    )
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
