@@ -35,6 +35,16 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+
+  // For navigation requests, serve cached index.html (app shell)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match(BASE + 'index.html').then(resp => resp || fetch(event.request))
+    );
+    return;
+  }
+
+  // For other assets: cache-first, then network
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
   );
