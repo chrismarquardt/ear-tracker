@@ -9,9 +9,9 @@ const STORAGE_KEY = 'ear-tracker-data';
 
 // Tracker config
 const symptomKeys = [
-  { key: 'lf_loss', label: 'LF loss' },
-  { key: 'lf_noise', label: 'LF noise' },
-  { key: 'hf_noise', label: 'LF noise' },
+  { key: 'lf_loss', label: 'LF Loss' },
+  { key: 'lf_noise', label: 'LF Noise' },
+  { key: 'hf_noise', label: 'HF Noise' },
   { key: 'vertigo', label: 'Vertigo' }
 ];
 const intakeKeys = [
@@ -20,8 +20,8 @@ const intakeKeys = [
   { key: 'sugar', label: 'Sugar' },
   { key: 'alcohol', label: 'Alc' }
 ];
-const sleepKey = { key: 'sleep', label: 'Sleep Q' };
-const stressKey = { key: 'stress', label: 'Stress lvl' };
+const sleepKey = { key: 'sleep', label: 'Sleep Qu' };
+const stressKey = { key: 'stress', label: 'Stress Lvl' };
 
 // Helper: get current date string (yyyy-mm-dd) with 5am day start
 function getTodayKey(now = new Date()) {
