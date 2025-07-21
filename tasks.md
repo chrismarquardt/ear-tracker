@@ -25,9 +25,9 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Test: Clicking tabs switches active tab visually; clicking radio buttons updates selected value visually
 
 ## 4. Water Intake Controls
-- [ ] Implement `WaterButton.js` to add 200ml to water intake for the day
-- [ ] Implement editable text field for daily water sum
-- [ ] Integrate water controls into main tracker UI
+- [x] Implement `WaterButton.js` to add 200ml to water intake for the day
+- [x] Implement editable text field for daily water sum
+- [x] Integrate water controls into main tracker UI
 - [ ] Test: Tapping button increases sum, editing field updates value, and both persist after reload
 
 ## 5. State Updates & Persistence
