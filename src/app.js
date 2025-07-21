@@ -192,7 +192,7 @@ function render() {
   waterInput.step = '50';
   waterInput.value = dayData.waterSum;
   waterInput.style.flex = '0 0 50px';
-  waterInput.style.width = '100px';
+  waterInput.style.width = '60px';
   waterInput.style.fontSize = '0.9rem';
   waterInput.style.textAlign = 'right';
   waterInput.onfocus = () => waterInput.select();
