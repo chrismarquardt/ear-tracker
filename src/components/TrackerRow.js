@@ -5,12 +5,12 @@ export function TrackerRow({ label, value = 0, onChange }) {
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
-  row.style.margin = '4px 4px 4px 4px';
+  row.style.margin = '2px 8px 4px 4px';
 
   const lbl = document.createElement('span');
   lbl.textContent = label;
-  lbl.style.flex = '0 0 90px';
-  lbl.style.marginRight = '8px';
+  lbl.style.flex = '0 0 80px';
+  lbl.style.marginRight = '4px';
   lbl.style.fontSize = '0.9rem';
   row.appendChild(lbl);
 
