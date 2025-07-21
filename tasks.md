@@ -6,9 +6,9 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 
 ## 1. Project Setup & App Shell
 - [x] Create project folder structure as per architecture.md
-- [ ] Add empty `index.html`, `manifest.json`, `service-worker.js`, `/src/app.js`, `/src/storage.js`, `/src/ui.js`, `/src/styles.css`, and `/src/components/` with placeholder files
-- [ ] Implement minimal `index.html` with root div, links to JS and CSS
-- [ ] Add PWA manifest (`manifest.json`) with app name, icon placeholder, and theme color
+- [x] Add empty `index.html`, `manifest.json`, `service-worker.js`, `/src/app.js`, `/src/storage.js`, `/src/ui.js`, `/src/styles.css`, and `/src/components/` with placeholder files
+- [x] Implement minimal `index.html` with root div, links to JS and CSS
+- [x] Add PWA manifest (`manifest.json`) with app name, icon placeholder, and theme color
 - [ ] Add empty `service-worker.js` and register it in `index.html`
 - [ ] Add a basic `/src/styles.css` with mobile-friendly base styles
 - [ ] Test: App loads without errors and displays placeholder
