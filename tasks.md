@@ -22,7 +22,7 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Implement `Tabs.js` to render tabs for morning, noon, evening, night, with event listeners to switch active tab
 - [x] Implement `TrackerRow.js` to render a label and 5 radio buttons (1-5), with event handling for selection
 - [x] In `ui.js`, render all tracker rows for symptoms, intake, sleep, stress for the selected tab
-- [ ] Test: Clicking tabs switches active tab visually; clicking radio buttons updates selected value visually
+- [x] Test: Clicking tabs switches active tab visually; clicking radio buttons updates selected value visually
 
 ## 4. Water Intake Controls
 - [ ] Implement `WaterButton.js` to add 200ml to water intake for the day

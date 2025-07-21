@@ -13,16 +13,27 @@ export function TrackerRow({ label, value = 0, onChange }) {
   lbl.style.marginRight = '12px';
   row.appendChild(lbl);
 
+  const btnGroup = document.createElement('div');
+  btnGroup.style.display = 'flex';
+  btnGroup.style.flex = '1';
+  btnGroup.style.gap = '6px';
+
   for (let i = 1; i <= 5; i++) {
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = label;
-    radio.value = i;
-    radio.checked = value === i;
-    radio.style.margin = '0 4px';
-    radio.onclick = () => onChange && onChange(i);
-    row.appendChild(radio);
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.type = 'button';
+    btn.style.flex = '1';
+    btn.style.padding = '16px 0';
+    btn.style.fontSize = '1.2rem';
+    btn.style.border = value === i ? '2px solid #1976d2' : '1px solid #ccc';
+    btn.style.background = value === i ? '#1976d2' : '#f0f0f0';
+    btn.style.color = value === i ? '#fff' : '#222';
+    btn.style.borderRadius = '8px';
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => onChange && onChange(i);
+    btnGroup.appendChild(btn);
   }
 
+  row.appendChild(btnGroup);
   return row;
 }
