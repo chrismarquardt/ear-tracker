@@ -36,6 +36,21 @@ button, input, select, textarea {
   outline-offset: 2px;
 }
 
+.tracker-group {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.tracker-group-title {
+  font-weight: bold;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+  color: #1976d2;
+}
+.tracker-group:last-child {
+  border-bottom: none;
+}
+
 @media (max-width: 600px) {
   #app {
     padding: 8px 0 16px 0;

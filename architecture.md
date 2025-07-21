@@ -18,7 +18,7 @@ ear-tracker/
 │   ├── storage.js        # Local storage service (get/set/export/import)
 │   ├── ui.js             # UI rendering, event handlers
 │   ├── components/       # UI components (modular, reusable)
-│   │   ├── Tabs.js           # Tab navigation (morning, noon, etc)
+│   │   ├── Tabs.js           # Tab navigation (morning, mid-day, etc)
 │   │   ├── TrackerRow.js     # Row for each tracked value (label + radio buttons)
 │   │   ├── WaterButton.js    # Button for adding water intake
 │   │   ├── SettingsModal.js  # Settings (import/export)
@@ -34,7 +34,7 @@ ear-tracker/
 - **index.html**: Loads the app, root for mounting UI, links manifest and styles.
 - **manifest.json**: PWA metadata (icon, name, etc).
 - **service-worker.js**: Enables offline use, caches assets.
-- **/src/app.js**: Main entry. Initializes app, manages global state, handles tab switching, and coordinates between UI and storage.
+- **/src/app.js**: Main entry. Initializes app, manages global state, handles tab switching, date switching, and coordinates between UI and storage.
 - **/src/storage.js**: Abstracts all localStorage access. Handles saving, loading, exporting, and importing data as JSON.
 - **/src/ui.js**: Renders UI, attaches event listeners, updates DOM on state changes.
 - **/src/components/**: Small, focused UI modules:
@@ -49,16 +49,32 @@ ear-tracker/
 
 ## State Management
 
+- **What is Tracked:**
+    - **Symptoms:**
+        - Low-frequency hearing loss
+        - Low-frequency noise level
+        - High-frequency noise level
+    - **Daily Intake:**
+        - Water (special button for +200ml, editable sum)
+        - Sodium
+        - Refined carbs
+        - Sugar
+        - Alcohol
+    - **Sleep Quality:** (1 is bad, 5 is great)
+    - **Stress Level:** (1 is little, 5 is lots)
+
 - **Where State Lives:**
-    - All tracked data (symptoms, intake, sleep, stress) is stored in `localStorage` as a single JSON object, keyed by date and time frame (morning, noon, etc).
-    - UI state (current tab, modal open/close) is kept in memory (in JS variables in `app.js`).
+    - All tracked data is stored in `localStorage` as a single JSON object, keyed by date in `yyyy-mm-dd` format. The app determines the current date based on a day starting at 5am (i.e., changes between midnight and 5am are counted for the previous day).
+    - UI state (current tab, modal open/close, selected date) is kept in memory (in JS variables in `app.js`).
     - Water intake is tracked as a sum per day, with each button tap adding 200ml and an editable text field that holds the sum per day.
 
 - **State Flow:**
-    1. On load, `app.js` loads data from `localStorage` via `storage.js`.
-    2. UI is rendered based on current state.
-    3. User actions (radio tap, water button, import/export) update state in memory and persist to `localStorage`.
+    1. On load, `app.js` determines the current date (with 5am day start), loads data for that date from `localStorage` via `storage.js`.
+    2. UI is rendered based on current state and selected date.
+    3. User actions (radio tap, water button, import/export, date switch) update state in memory and persist to `localStorage` for the correct date.
     4. Debug panel always shows current `localStorage` content.
+    5. UI includes a date switcher (arrows to move day forward/backward).
+    6. **Symptoms and Intake are visually grouped in the UI, and each sub-item is tracked separately.**
 
 ---
 
@@ -68,7 +84,7 @@ ear-tracker/
 - **All data is local.**
 - **Import/Export:**
     - Export: User taps button, app generates JSON from localStorage, triggers file download.
-    - Import: User selects JSON file, app parses and loads data into localStorage (overwriting if needed, merging not required).
+    - Import: User selects JSON file, app parses and loads data into localStorage (overwriting as needed, merging not required).
 - **PWA:**
     - `service-worker.js` caches assets for offline use.
     - `manifest.json` enables "Add to Home Screen" and app-like experience.

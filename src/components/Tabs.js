@@ -4,7 +4,7 @@
 export function Tabs({ active = 'morning', onChange }) {
   const times = [
     { key: 'morning', label: 'Morning' },
-    { key: 'noon', label: 'Noon' },
+    { key: 'midday', label: 'Mid-Day' },
     { key: 'evening', label: 'Evening' },
     { key: 'night', label: 'Night' }
   ];
