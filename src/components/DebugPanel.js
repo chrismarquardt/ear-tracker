@@ -14,26 +14,76 @@ export function DebugPanel({ storageKey }) {
   swStatus.style.color = '#1976d2';
   swStatus.textContent = 'Service Worker: checking...';
   wrap.appendChild(swStatus);
+
+  // Detailed SW debug info
+  const swDebug = document.createElement('div');
+  swDebug.style.fontSize = '0.75rem';
+  swDebug.style.background = '#f5f5f5';
+  swDebug.style.color = '#333';
+  swDebug.style.border = '1px solid #eee';
+  swDebug.style.borderRadius = '6px';
+  swDebug.style.padding = '6px 10px';
+  swDebug.style.marginBottom = '6px';
+  swDebug.style.wordBreak = 'break-all';
+  swDebug.style.display = 'none';
+  wrap.appendChild(swDebug);
+
+  let lastEvent = null;
+  function updateSWDebug(reg, err) {
+    let info = '';
+    if (reg) {
+      info += `scope: ${reg.scope}\n`;
+      if (reg.active) info += `active: ${reg.active.state}\n`;
+      if (reg.installing) info += `installing: ${reg.installing.state}\n`;
+      if (reg.waiting) info += `waiting: ${reg.waiting.state}\n`;
+    }
+    if (lastEvent) info += `last event: ${lastEvent}\n`;
+    if (err) info += `error: ${err.message || err}`;
+    swDebug.textContent = info;
+    swDebug.style.display = info ? 'block' : 'none';
+  }
+
   setTimeout(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration().then(reg => {
         if (!reg) {
           swStatus.textContent = 'Service Worker: not registered';
           swStatus.style.color = '#c62828';
+          updateSWDebug(null);
         } else if (reg.active) {
           swStatus.textContent = 'Service Worker: active';
           swStatus.style.color = '#388e3c';
+          updateSWDebug(reg);
         } else if (reg.installing) {
           swStatus.textContent = 'Service Worker: installing...';
           swStatus.style.color = '#fbc02d';
+          updateSWDebug(reg);
         } else {
           swStatus.textContent = 'Service Worker: registered (not active)';
           swStatus.style.color = '#fbc02d';
+          updateSWDebug(reg);
         }
+      }).catch(err => {
+        swStatus.textContent = 'Service Worker: error';
+        swStatus.style.color = '#c62828';
+        updateSWDebug(null, err);
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        lastEvent = 'controllerchange';
+        setTimeout(() => navigator.serviceWorker.getRegistration().then(updateSWDebug), 100);
+      });
+      navigator.serviceWorker.addEventListener('message', () => {
+        lastEvent = 'message';
+        setTimeout(() => navigator.serviceWorker.getRegistration().then(updateSWDebug), 100);
+      });
+      navigator.serviceWorker.addEventListener('error', (e) => {
+        lastEvent = 'error';
+        updateSWDebug(null, e);
       });
     } else {
       swStatus.textContent = 'Service Worker: not supported';
       swStatus.style.color = '#c62828';
+      updateSWDebug(null);
     }
   }, 0);
 
