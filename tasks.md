@@ -19,7 +19,7 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Write tests to verify data can be saved, loaded, exported, and imported from localStorage
 
 ## 3. Tab Navigation & Tracker Rows
-- [ ] Implement `Tabs.js` to render tabs for morning, noon, evening, night, with event listeners to switch active tab
+- [x] Implement `Tabs.js` to render tabs for morning, noon, evening, night, with event listeners to switch active tab
 - [ ] Implement `TrackerRow.js` to render a label and 5 radio buttons (1-5), with event handling for selection
 - [ ] In `ui.js`, render all tracker rows for symptoms, intake, sleep, stress for the selected tab
 - [ ] Test: Clicking tabs switches active tab visually; clicking radio buttons updates selected value visually
