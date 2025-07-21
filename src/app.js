@@ -11,7 +11,8 @@ const STORAGE_KEY = 'ear-tracker-data';
 const symptomKeys = [
   { key: 'lf_loss', label: 'Low-freq loss' },
   { key: 'lf_noise', label: 'Low-freq noise' },
-  { key: 'hf_noise', label: 'High-freq noise' }
+  { key: 'hf_noise', label: 'High-freq noise' },
+  { key: 'vertigo', label: 'Vertigo' }
 ];
 const intakeKeys = [
   { key: 'sodium', label: 'Sodium' },
@@ -181,6 +182,7 @@ function render() {
   waterWrap.style.alignItems = 'center';
   waterWrap.style.gap = '6px';
   waterWrap.style.margin = '8px 0 12px 0';
+  waterWrap.style.paddingLeft = '16px';
 
   const waterBtn = WaterButton({
     onAdd: () => {
@@ -198,7 +200,7 @@ function render() {
   waterInput.min = '0';
   waterInput.step = '50';
   waterInput.value = dayData.waterSum;
-  waterInput.style.flex = '0 0 70px';
+  waterInput.style.flex = '0 0 60px';
   waterInput.style.fontSize = '1rem';
   waterInput.style.textAlign = 'right';
   waterInput.onfocus = () => waterInput.select();
@@ -316,16 +318,30 @@ function render() {
   stressGroup.appendChild(stressRow);
   tabArea.appendChild(stressGroup);
 
+  // --- Notes ---
+  const noteGroup = document.createElement('div');
+  noteGroup.className = 'tracker-group';
+  noteGroup.style.marginTop = '18px';
+  const noteTitle = document.createElement('div');
+  noteTitle.className = 'tracker-group-title';
+  noteTitle.textContent = 'Notes';
+  noteGroup.appendChild(noteTitle);
+  const noteArea = document.createElement('textarea');
+  noteArea.rows = 3;
+  noteArea.style.width = '100%';
+  noteArea.style.fontSize = '0.9rem';
+  noteArea.value = dayData.note || '';
+  noteArea.oninput = (e) => {
+    dayData.note = e.target.value;
+    persist();
+  };
+  noteGroup.appendChild(noteArea);
+  tabArea.appendChild(noteGroup);
+
   app.appendChild(tabArea);
 
-  const info = document.createElement('div');
-  info.style.textAlign = 'center';
-  info.style.marginTop = '24px';
-  info.textContent = `Active tab: ${currentTab}`;
-  app.appendChild(info);
-
   // Debug panel (always visible, updates live)
-  const debug = DebugPanel({ storageKey: STORAGE_KEY });
+  const debug = DebugPanel({ storageKey: STORAGE_KEY, activeTab: currentTab });
   app.appendChild(debug);
 
   // Settings modal

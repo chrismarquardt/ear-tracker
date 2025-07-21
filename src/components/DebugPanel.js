@@ -1,19 +1,14 @@
 // Minimal DebugPanel component
 // Usage: DebugPanel({ storageKey })
 
-export function DebugPanel({ storageKey }) {
+export function DebugPanel({ storageKey, activeTab = '' }) {
   const wrap = document.createElement('div');
   wrap.style.display = 'flex';
   wrap.style.flexDirection = 'column';
   wrap.style.alignItems = 'stretch';
 
-  // Service worker status (force update every render)
-  const swStatus = document.createElement('div');
-  swStatus.style.fontSize = '0.8rem';
-  swStatus.style.marginBottom = '4px';
-  swStatus.style.color = '#1976d2';
-  swStatus.textContent = 'Service Worker: checking...';
-  wrap.appendChild(swStatus);
+  // Will append SW status later inside panel
+  let swStatusText = 'Service Worker: checking...';
 
   // Detailed SW debug info
   const swDebug = document.createElement('div');
@@ -47,25 +42,20 @@ export function DebugPanel({ storageKey }) {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration().then(reg => {
         if (!reg) {
-          swStatus.textContent = 'Service Worker: not registered';
-          swStatus.style.color = '#c62828';
+          swStatusText = 'Service Worker: not registered';
           updateSWDebug(null);
         } else if (reg.active) {
-          swStatus.textContent = 'Service Worker: active';
-          swStatus.style.color = '#388e3c';
+          swStatusText = 'Service Worker: active';
           updateSWDebug(reg);
         } else if (reg.installing) {
-          swStatus.textContent = 'Service Worker: installing...';
-          swStatus.style.color = '#fbc02d';
+          swStatusText = 'Service Worker: installing...';
           updateSWDebug(reg);
         } else {
-          swStatus.textContent = 'Service Worker: registered (not active)';
-          swStatus.style.color = '#fbc02d';
+          swStatusText = 'Service Worker: registered (not active)';
           updateSWDebug(reg);
         }
       }).catch(err => {
-        swStatus.textContent = 'Service Worker: error';
-        swStatus.style.color = '#c62828';
+        swStatusText = 'Service Worker: error';
         updateSWDebug(null, err);
       });
       navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -81,8 +71,7 @@ export function DebugPanel({ storageKey }) {
         updateSWDebug(null, e);
       });
     } else {
-      swStatus.textContent = 'Service Worker: not supported';
-      swStatus.style.color = '#c62828';
+      swStatusText = 'Service Worker: not supported';
       updateSWDebug(null);
     }
   }, 0);
@@ -139,6 +128,14 @@ export function DebugPanel({ storageKey }) {
   header.appendChild(label);
 
   panel.appendChild(header);
+
+  // Status block (SW + active tab)
+  const statusBlock = document.createElement('div');
+  statusBlock.style.padding = '4px 12px 4px 12px';
+  statusBlock.style.fontSize = '0.75rem';
+  statusBlock.style.color = '#fff';
+  statusBlock.textContent = `${swStatusText} | Active tab: ${activeTab}`;
+  panel.appendChild(statusBlock);
 
   const content = document.createElement('div');
   content.style.padding = '0 12px 12px 12px';
