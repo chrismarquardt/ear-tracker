@@ -9,7 +9,7 @@ const STORAGE_KEY = 'ear-tracker-data';
 
 // Tracker config
 const symptomKeys = [
-  { key: 'lf_completeness', label: 'Lf Cplt
+  { key: 'lf_completeness', label: 'Lf Cpl' },
   { key: 'lf_noise', label: 'LF Noise' },
   { key: 'hf_noise', label: 'HF Noise' },
   { key: 'vertigo', label: 'Vertigo' }
