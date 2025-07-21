@@ -20,8 +20,8 @@ const intakeKeys = [
   { key: 'sugar', label: 'Sugar' },
   { key: 'alcohol', label: 'Alc' }
 ];
-const sleepKey = { key: 'sleep', label: 'Sleep' };
-const stressKey = { key: 'stress', label: 'Stress' };
+const sleepKey = { key: 'sleep', label: 'Sleep Q' };
+const stressKey = { key: 'stress', label: 'Stress lvl' };
 
 // Helper: get current date string (yyyy-mm-dd) with 5am day start
 function getTodayKey(now = new Date()) {
@@ -274,14 +274,15 @@ function render() {
   });
   tabArea.appendChild(intakeGroup);
 
-  // --- Sleep quality ---
-  const sleepGroup = document.createElement('div');
-  sleepGroup.className = 'tracker-group';
-  sleepGroup.style.marginTop = '18px';
-  const sleepTitle = document.createElement('div');
-  sleepTitle.className = 'tracker-group-title';
-  sleepTitle.textContent = 'Sleep Quality';
-  sleepGroup.appendChild(sleepTitle);
+  // --- Other (Sleep & Stress) ---
+  const otherGroup = document.createElement('div');
+  otherGroup.className = 'tracker-group';
+  otherGroup.style.marginTop = '18px';
+  const otherTitle = document.createElement('div');
+  otherTitle.className = 'tracker-group-title';
+  otherTitle.textContent = 'Other';
+  otherGroup.appendChild(otherTitle);
+
   const sleepRow = TrackerRow({
     label: sleepKey.label,
     value: dayData.sleep || 0,
@@ -291,17 +292,8 @@ function render() {
       render();
     }
   });
-  sleepGroup.appendChild(sleepRow);
-  tabArea.appendChild(sleepGroup);
+  otherGroup.appendChild(sleepRow);
 
-  // --- Stress level ---
-  const stressGroup = document.createElement('div');
-  stressGroup.className = 'tracker-group';
-  stressGroup.style.marginTop = '18px';
-  const stressTitle = document.createElement('div');
-  stressTitle.className = 'tracker-group-title';
-  stressTitle.textContent = 'Stress Level';
-  stressGroup.appendChild(stressTitle);
   const stressRow = TrackerRow({
     label: stressKey.label,
     value: dayData.stress || 0,
@@ -311,8 +303,9 @@ function render() {
       render();
     }
   });
-  stressGroup.appendChild(stressRow);
-  tabArea.appendChild(stressGroup);
+  otherGroup.appendChild(stressRow);
+
+  tabArea.appendChild(otherGroup);
 
   // --- Notes ---
   const noteGroup = document.createElement('div');
