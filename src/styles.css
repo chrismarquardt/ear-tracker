@@ -1,0 +1,43 @@
+/* Basic mobile-friendly base styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  background: #fafbfc;
+  color: #222;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#app {
+  flex: 1 0 auto;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 16px 0 32px 0;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  #app {
+    padding: 8px 0 16px 0;
+  }
+}

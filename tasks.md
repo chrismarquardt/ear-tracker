@@ -10,8 +10,8 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Implement minimal `index.html` with root div, links to JS and CSS
 - [x] Add PWA manifest (`manifest.json`) with app name, icon placeholder, and theme color
 - [x] Add empty `service-worker.js` and register it in `index.html`
-- [ ] Add a basic `/src/styles.css` with mobile-friendly base styles
-- [ ] Test: App loads without errors and displays placeholder
+- [x] Add a basic `/src/styles.css` with mobile-friendly base styles
+- [x] Test: App loads without errors and displays placeholder
 
 ## 2. State & Storage Core
 - [ ] Implement `storage.js` with functions: `loadData()`, `saveData(data)`, `exportData()`, `importData(json)`
