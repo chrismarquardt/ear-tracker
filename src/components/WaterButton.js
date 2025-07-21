@@ -6,7 +6,7 @@ export function WaterButton({ onAdd }) {
   btn.type = 'button';
   btn.textContent = '+200ml';
   btn.style.padding = '16px 0';
-  btn.style.fontSize = '1.1rem';
+  btn.style.fontSize = '0.9rem';
   btn.style.background = '#1976d2';
   btn.style.color = '#fff';
   btn.style.border = 'none';

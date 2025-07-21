@@ -124,7 +124,7 @@ function render() {
   topBar.style.alignItems = 'center';
   topBar.style.justifyContent = 'space-between';
   // topBar.style.padding = '8px 16px';
-  topBar.style.padding = '0px 4px';
+  topBar.style.padding = '0px 6px';
   topBar.style.background = '#f5f7fa';
   topBar.style.borderRadius = '12px';
   topBar.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
@@ -173,7 +173,7 @@ function render() {
   waterWrap.style.display = 'flex';
   waterWrap.style.alignItems = 'center';
   waterWrap.style.gap = '6px';
-  waterWrap.style.paddingLeft = '4px';
+  waterWrap.style.paddingLeft = '6px';
 
   const waterBtn = WaterButton({
     onAdd: () => {

@@ -5,7 +5,7 @@ export function TrackerRow({ label, value = 0, onChange }) {
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
-  row.style.margin = '8px 0';
+  row.style.margin = '4px 4px 4px 4px';
 
   const lbl = document.createElement('span');
   lbl.textContent = label;
@@ -26,7 +26,8 @@ export function TrackerRow({ label, value = 0, onChange }) {
     btn.style.flex = '1';
     btn.style.padding = '10px 0';
     btn.style.fontSize = '1rem';
-    btn.style.border = value === i ? '2px solid #1976d2' : '1px solid #ccc';
+    btn.style.border = value === i ? '1px solid #1976d2' : 'none';
+    // btn.style.border = value === i ? '1px solid #1976d2' : '1px solid #ccc';
     btn.style.background = value === i ? '#1976d2' : '#f0f0f0';
     btn.style.color = value === i ? '#fff' : '#222';
     btn.style.borderRadius = '6px';
@@ -40,9 +41,10 @@ export function TrackerRow({ label, value = 0, onChange }) {
   cancelBtn.textContent = '×';
   cancelBtn.type = 'button';
   cancelBtn.style.padding = '10px 12px';
+  cancelBtn.style.margin = '0px 0px 0px 4px';
   cancelBtn.style.fontSize = '1rem';
-  cancelBtn.style.border = '1px solid #ccc';
-  cancelBtn.style.background = '#f0f0f0';
+  cancelBtn.style.border = 'none';
+  cancelBtn.style.background = '#ffe7e7';
   cancelBtn.style.color = '#222';
   cancelBtn.style.borderRadius = '6px';
   cancelBtn.style.cursor = 'pointer';
