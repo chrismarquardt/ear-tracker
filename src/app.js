@@ -9,16 +9,16 @@ const STORAGE_KEY = 'ear-tracker-data';
 
 // Tracker config
 const symptomKeys = [
-  { key: 'lf_loss', label: 'Low-freq loss' },
-  { key: 'lf_noise', label: 'Low-freq noise' },
-  { key: 'hf_noise', label: 'High-freq noise' },
+  { key: 'lf_loss', label: 'LF loss' },
+  { key: 'lf_noise', label: 'LF noise' },
+  { key: 'hf_noise', label: 'LF noise' },
   { key: 'vertigo', label: 'Vertigo' }
 ];
 const intakeKeys = [
   { key: 'sodium', label: 'Sodium' },
-  { key: 'carbs', label: 'Refined carbs' },
+  { key: 'carbs', label: 'RF Carbs' },
   { key: 'sugar', label: 'Sugar' },
-  { key: 'alcohol', label: 'Alcohol' }
+  { key: 'alcohol', label: 'Alc' }
 ];
 const sleepKey = { key: 'sleep', label: 'Sleep' };
 const stressKey = { key: 'stress', label: 'Stress' };
@@ -123,11 +123,12 @@ function render() {
   topBar.style.display = 'flex';
   topBar.style.alignItems = 'center';
   topBar.style.justifyContent = 'space-between';
-  topBar.style.padding = '8px 16px';
+  // topBar.style.padding = '8px 16px';
+  topBar.style.padding = '0px 4px';
   topBar.style.background = '#f5f7fa';
   topBar.style.borderRadius = '12px';
   topBar.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
-  topBar.style.marginBottom = '16px';
+  topBar.style.marginBottom = '0px';
 
   // Date switcher
   const dateWrap = document.createElement('div');
@@ -165,7 +166,6 @@ function render() {
   };
   dateWrap.appendChild(nextBtn);
 
-  topBar.appendChild(dateWrap);
 
   // Water intake controls
   const dayData = getDayData(selectedDate);
@@ -173,7 +173,7 @@ function render() {
   waterWrap.style.display = 'flex';
   waterWrap.style.alignItems = 'center';
   waterWrap.style.gap = '6px';
-  waterWrap.style.paddingLeft = '0';
+  waterWrap.style.paddingLeft = '4px';
 
   const waterBtn = WaterButton({
     onAdd: () => {
@@ -192,6 +192,7 @@ function render() {
   waterInput.step = '50';
   waterInput.value = dayData.waterSum;
   waterInput.style.flex = '0 0 50px';
+  waterInput.style.width = '100px';
   waterInput.style.fontSize = '0.9rem';
   waterInput.style.textAlign = 'right';
   waterInput.onfocus = () => waterInput.select();
@@ -208,6 +209,7 @@ function render() {
   waterWrap.appendChild(mlLabel);
 
   topBar.appendChild(waterWrap);
+  topBar.appendChild(dateWrap);
 
   app.appendChild(topBar);
 
@@ -217,7 +219,7 @@ function render() {
   tabArea.style.background = '#f5f7fa';
   tabArea.style.borderRadius = '12px';
   tabArea.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
-  tabArea.style.padding = '16px';
+  tabArea.style.padding = '4px';
   tabArea.style.marginBottom = '16px';
 
   const tabs = Tabs({
@@ -340,19 +342,6 @@ function render() {
 
   // Cogwheel button at bottom
   const cog = document.createElement('button');
-  cog.innerHTML = '⚙️';
-  cog.title = 'Settings';
-  cog.style.background = 'none';
-  cog.style.border = 'none';
-  cog.style.fontSize = '1.6rem';
-  cog.style.cursor = 'pointer';
-  cog.style.margin = '12px auto';
-  cog.onclick = () => {
-    settingsOpen = true;
-    render();
-  };
-  app.appendChild(cog);
-
   // Settings modal
   const modal = SettingsModal({
     open: settingsOpen,

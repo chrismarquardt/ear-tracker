@@ -38,13 +38,14 @@ button, input, select, textarea {
 
 .tracker-group {
   margin-bottom: 8px;
-  padding-bottom: 8px;
+  padding-bottom: 0px;
   border-bottom: none;
 }
 .tracker-group-title {
   font-weight: bold;
   font-size: 1.05rem;
   margin-bottom: 6px;
+  padding-top: 0px
   color: #1976d2;
 }
 .tracker-group:last-child {
