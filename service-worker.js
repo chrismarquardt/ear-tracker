@@ -1,3 +1,4 @@
+console.log('Service Worker: script loaded');
 const CACHE_NAME = 'ear-tracker-v1';
 const ASSETS = [
   '/',
@@ -21,6 +22,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
   self.skipWaiting();
+  console.log('Service Worker: install event');
 });
 
 self.addEventListener('activate', event => {
@@ -30,10 +32,14 @@ self.addEventListener('activate', event => {
     )
   );
   self.clients.claim();
+  console.log('Service Worker: activate event');
 });
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  if (event.request && event.request.url) {
+    console.log('Service Worker: fetch', event.request.url);
+  }
   event.respondWith(
     caches.match(event.request).then(response =>
       response || fetch(event.request)
