@@ -144,7 +144,8 @@ function render() {
 
   const prevBtn = document.createElement('button');
   prevBtn.textContent = '←';
-  prevBtn.style.fontSize = '1.2rem';
+  prevBtn.style.fontSize = '1.4rem';
+  prevBtn.style.padding = '6px 12px';
   prevBtn.onclick = () => {
     const d = new Date(selectedDate);
     d.setDate(d.getDate() - 1);
@@ -161,7 +162,8 @@ function render() {
 
   const nextBtn = document.createElement('button');
   nextBtn.textContent = '→';
-  nextBtn.style.fontSize = '1.2rem';
+  nextBtn.style.fontSize = '1.4rem';
+  nextBtn.style.padding = '6px 12px';
   nextBtn.onclick = () => {
     const d = new Date(selectedDate);
     d.setDate(d.getDate() + 1);
@@ -177,17 +179,29 @@ function render() {
   const waterWrap = document.createElement('div');
   waterWrap.style.display = 'flex';
   waterWrap.style.alignItems = 'center';
-  waterWrap.style.gap = '8px';
-  waterWrap.style.margin = '12px 0 20px 0';
+  waterWrap.style.gap = '6px';
+  waterWrap.style.margin = '8px 0 12px 0';
+
+  const waterBtn = WaterButton({
+    onAdd: () => {
+      dayData.waterSum += 200;
+      persist();
+      render();
+    }
+  });
+  waterBtn.style.width = '90px';
+  waterBtn.style.padding = '10px 0';
+  waterWrap.appendChild(waterBtn);
 
   const waterInput = document.createElement('input');
   waterInput.type = 'number';
   waterInput.min = '0';
   waterInput.step = '50';
   waterInput.value = dayData.waterSum;
-  waterInput.style.width = '80px';
-  waterInput.style.fontSize = '1.1rem';
+  waterInput.style.flex = '0 0 70px';
+  waterInput.style.fontSize = '1rem';
   waterInput.style.textAlign = 'right';
+  waterInput.onfocus = () => waterInput.select();
   waterInput.onchange = (e) => {
     dayData.waterSum = parseInt(e.target.value, 10) || 0;
     persist();
@@ -196,16 +210,9 @@ function render() {
   waterWrap.appendChild(waterInput);
   const mlLabel = document.createElement('span');
   mlLabel.textContent = 'ml';
-  mlLabel.style.marginLeft = '4px';
+  mlLabel.style.fontSize = '0.9rem';
   waterWrap.appendChild(mlLabel);
-  const waterBtn = WaterButton({
-    onAdd: () => {
-      dayData.waterSum += 200;
-      persist();
-      render();
-    }
-  });
-  waterWrap.appendChild(waterBtn);
+
   app.appendChild(waterWrap);
 
   // Visually delimited tab area

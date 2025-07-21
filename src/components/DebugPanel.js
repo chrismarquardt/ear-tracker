@@ -88,7 +88,7 @@ export function DebugPanel({ storageKey }) {
   }, 0);
 
   // Collapsible localStorage output (arrow inside black box)
-  let expanded = true;
+  let expanded = localStorage.getItem('debug_expanded') === '1';
   const panel = document.createElement('pre');
   panel.style.background = '#222';
   panel.style.color = '#fff';
@@ -115,7 +115,7 @@ export function DebugPanel({ storageKey }) {
   header.style.borderTopRightRadius = '8px';
 
   const collapseBtn = document.createElement('button');
-  collapseBtn.textContent = '▼';
+  collapseBtn.textContent = expanded ? '▼' : '►';
   collapseBtn.style.background = 'none';
   collapseBtn.style.border = 'none';
   collapseBtn.style.color = '#fff';
@@ -127,6 +127,7 @@ export function DebugPanel({ storageKey }) {
     expanded = !expanded;
     content.style.display = expanded ? 'block' : 'none';
     collapseBtn.textContent = expanded ? '▼' : '►';
+    localStorage.setItem('debug_expanded', expanded ? '1' : '0');
   };
   header.appendChild(collapseBtn);
 
@@ -141,7 +142,7 @@ export function DebugPanel({ storageKey }) {
 
   const content = document.createElement('div');
   content.style.padding = '0 12px 12px 12px';
-  content.style.display = 'block';
+  content.style.display = expanded ? 'block' : 'none';
   content.textContent = pretty(localStorage.getItem(storageKey));
   panel.appendChild(content);
 
