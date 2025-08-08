@@ -235,13 +235,7 @@ function render() {
   topBar.appendChild(waterWrap);
   topBar.appendChild(dateWrap);
 
-  // Settings button
-  const settingsBtn = document.createElement('button');
-  settingsBtn.textContent = 'Settings';
-  settingsBtn.style.padding = '6px 12px';
-  settingsBtn.style.marginLeft = '8px';
-  settingsBtn.onclick = () => { settingsOpen = true; render(); };
-  topBar.appendChild(settingsBtn);
+  // Removed Settings button from top bar (moved below Notes)
 
   app.appendChild(topBar);
 
@@ -358,6 +352,18 @@ function render() {
   };
   noteGroup.appendChild(noteArea);
   tabArea.appendChild(noteGroup);
+
+  // Settings button moved below the Notes field
+  const settingsWrap = document.createElement('div');
+  settingsWrap.style.display = 'flex';
+  settingsWrap.style.justifyContent = 'flex-end';
+  settingsWrap.style.margin = '8px 4px 0 4px';
+  const settingsBtn = document.createElement('button');
+  settingsBtn.textContent = 'Settings';
+  settingsBtn.style.padding = '6px 12px';
+  settingsBtn.onclick = () => { settingsOpen = true; render(); };
+  settingsWrap.appendChild(settingsBtn);
+  tabArea.appendChild(settingsWrap);
 
   app.appendChild(tabArea);
 

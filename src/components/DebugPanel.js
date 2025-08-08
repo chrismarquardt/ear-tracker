@@ -33,7 +33,6 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
   function updateSWDebug(reg, err) {
     let info = '';
     if (reg) {
-      info += `scope: ${reg.scope}\n`;
       if (reg.active) info += `active: ${reg.active.state}\n`;
       if (reg.installing) info += `installing: ${reg.installing.state}\n`;
       if (reg.waiting) info += `waiting: ${reg.waiting.state}\n`;
@@ -49,15 +48,19 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
       navigator.serviceWorker.getRegistration().then(reg => {
         if (!reg) {
           setStatus('Service Worker: not registered');
+          scopeBlock.textContent = '';
           updateSWDebug(null);
         } else if (reg.active) {
           setStatus('Service Worker: active');
+          scopeBlock.textContent = `scope: ${reg.scope}`;
           updateSWDebug(reg);
         } else if (reg.installing) {
           setStatus('Service Worker: installing...');
+          scopeBlock.textContent = `scope: ${reg.scope}`;
           updateSWDebug(reg);
         } else {
           setStatus('Service Worker: registered (not active)');
+          scopeBlock.textContent = `scope: ${reg.scope}`;
           updateSWDebug(reg);
         }
       }).catch(err => {
@@ -66,11 +69,11 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
       });
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         lastEvent = 'controllerchange';
-        setTimeout(() => navigator.serviceWorker.getRegistration().then(updateSWDebug), 100);
+        setTimeout(() => navigator.serviceWorker.getRegistration().then(r => { if (r) scopeBlock.textContent = `scope: ${r.scope}`; updateSWDebug(r); }), 100);
       });
       navigator.serviceWorker.addEventListener('message', () => {
         lastEvent = 'message';
-        setTimeout(() => navigator.serviceWorker.getRegistration().then(updateSWDebug), 100);
+        setTimeout(() => navigator.serviceWorker.getRegistration().then(r => { if (r) scopeBlock.textContent = `scope: ${r.scope}`; updateSWDebug(r); }), 100);
       });
       navigator.serviceWorker.addEventListener('error', (e) => {
         lastEvent = 'error';
@@ -78,6 +81,7 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
       });
     } else {
       setStatus('Service Worker: not supported');
+      scopeBlock.textContent = '';
       updateSWDebug(null);
     }
   }, 0);
@@ -134,6 +138,13 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
   header.appendChild(label);
 
   panel.appendChild(header);
+
+  // Scope line inside the main debug panel, above status
+  const scopeBlock = document.createElement('div');
+  scopeBlock.style.padding = '0 12px 2px 12px';
+  scopeBlock.style.fontSize = '0.7rem';
+  scopeBlock.style.color = '#ddd';
+  panel.appendChild(scopeBlock);
 
   // Status block (SW + active tab)
   const statusBlock = document.createElement('div');
