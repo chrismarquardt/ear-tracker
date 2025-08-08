@@ -1,6 +1,6 @@
 console.log('Service Worker: script loaded');
 const CACHE_NAME = 'ear-tracker-v2';
-const BASE = (self.location.pathname.replace(/\/[^\/]*$/, '') || '/') + (self.location.pathname.endsWith('/') ? '' : '/');
+const BASE = self.location.pathname.replace(/\/[^\/]*$/, '/');
 const ASSETS = [
   BASE,
   BASE + 'index.html',
@@ -14,13 +14,18 @@ const ASSETS = [
   BASE + 'src/components/TrackerRow.js',
   BASE + 'src/components/WaterButton.js',
   BASE + 'src/components/SettingsModal.js',
-  BASE + 'src/components/DebugPanel.js'
+  BASE + 'src/components/DebugPanel.js',
+  BASE + 'src/components/Reports.js',
+  BASE + 'icon-192.png',
+  BASE + 'icon-512.png'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(ASSETS.map(url => cache.add(url))).then(() => undefined)
+    )
   );
 });
 
