@@ -1,4 +1,4 @@
-// Reports.js: Enhanced reporting with range, correlation, gap fill, and labels
+// Reports.js: Granular reporting with range, correlation, gap fill, and AI
 export function Reports(root) {
   root.innerHTML = '';
 
@@ -7,9 +7,10 @@ export function Reports(root) {
   let lagDays = 0;
   let showAvg = false;
   let showTrend = false;
-  let rangeDays = 14; // now selectable: 7, 14, 30
+  let rangeDays = 14; // selectable 7/14/30
   let corrType = 'pearson'; // 'pearson' | 'spearman'
-  let fillGaps = true; // intraday single-slot gap fill
+  let fillGaps = true; // intraday single-slot fill
+  let granularity = 'daily'; // 'daily' | 'tod'
 
   // Use app data if available, else empty
   const data = (typeof window !== 'undefined' && window.allData) ? window.allData : {};
@@ -116,41 +117,26 @@ export function Reports(root) {
   trendLabel.appendChild(document.createTextNode(' Show trend line'));
   controls.appendChild(trendLabel);
 
-  // OpenAI key helpers (Shortcut + store)
-  const aiWrap = document.createElement('div');
-  aiWrap.style.display = 'flex';
-  aiWrap.style.gap = '8px';
-  aiWrap.style.alignItems = 'center';
+  // Granularity selector
+  const granLabel = document.createElement('label');
+  granLabel.textContent = ' View: ';
+  const granSel = document.createElement('select');
+  [['daily','Daily avg'], ['tod','Time of day']].forEach(([val, label]) => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    granSel.appendChild(opt);
+  });
+  granSel.value = granularity;
+  granSel.onchange = e => { granularity = e.target.value; update(); };
+  granLabel.appendChild(granSel);
+  controls.appendChild(granLabel);
 
+  // AI Analyze button
   const aiBtn = document.createElement('button');
-  aiBtn.textContent = 'Get OpenAI key';
-  aiBtn.onclick = () => {
-    // Opens Apple Shortcut (works on iOS/macOS)
-    const url = 'shortcuts://run-shortcut?name=OpenApikey';
-    try { window.location.href = url; } catch (_) {}
-  };
-  aiWrap.appendChild(aiBtn);
-
-  const keyInput = document.createElement('input');
-  keyInput.type = 'password';
-  keyInput.placeholder = 'Enter API key';
-  keyInput.style.minWidth = '160px';
-  keyInput.value = (typeof localStorage !== 'undefined' && localStorage.getItem('openai_api_key')) || '';
-  aiWrap.appendChild(keyInput);
-
-  const saveBtn = document.createElement('button');
-  saveBtn.textContent = 'Save';
-  saveBtn.onclick = () => {
-    if (typeof localStorage !== 'undefined') {
-      if (keyInput.value) localStorage.setItem('openai_api_key', keyInput.value);
-      else localStorage.removeItem('openai_api_key');
-      saveBtn.textContent = 'Saved';
-      setTimeout(() => (saveBtn.textContent = 'Save'), 800);
-    }
-  };
-  aiWrap.appendChild(saveBtn);
-
-  controls.appendChild(aiWrap);
+  aiBtn.textContent = 'Analyze with AI';
+  aiBtn.onclick = () => analyzeWithAI({ data, reportType, rangeDays, corrType, granularity, fillGaps });
+  controls.appendChild(aiBtn);
 
   root.appendChild(controls);
 
@@ -169,7 +155,7 @@ export function Reports(root) {
 
   // Canvas for graph
   const canvas = document.createElement('canvas');
-  canvas.width = Math.min((graph.clientWidth || 360) - 16, 560);
+  canvas.width = 360;
   canvas.height = 210;
   canvas.style.width = '100%';
   canvas.style.maxWidth = '560px';
@@ -179,27 +165,29 @@ export function Reports(root) {
   root.appendChild(graph);
 
   function drawGraph() {
-    // Responsive canvas width for mobile
+    // Responsive width
     const targetW = Math.min((graph.clientWidth || 360) - 16, 560);
     if (Math.abs(canvas.width - targetW) > 2) canvas.width = targetW;
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const { symptomSeries, factorSeries } = buildReportSeries({ reportType, lagDays, rangeDays, data, fillGaps });
+    const plotted = buildReportSeries({ reportType, lagDays, rangeDays, data, fillGaps });
+    const { symptomSeries, factorSeries, todSeries } = plotted;
+
     // Y axis: 1-5
     const yMin = 1, yMax = 5;
-    const N = symptomSeries.length;
+    const baseSeries = granularity === 'tod' ? (symptomSeries) : symptomSeries;
+    const N = baseSeries.length;
     if (N <= 1) return;
 
-    // X axis: evenly spaced
+    // X axis and frame
     const padX = 28;
     const topPad = 18;
     const bottomPad = 26;
     const W = canvas.width - padX * 2;
     const H = canvas.height - (topPad + bottomPad);
 
-    // Axes
     ctx.strokeStyle = '#ccc';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -208,17 +196,41 @@ export function Reports(root) {
     ctx.lineTo(padX + W, topPad + H);
     ctx.stroke();
 
-    // Draw bars (symptoms)
-    const barW = Math.max(6, Math.floor(W / (N * 2)));
-    symptomSeries.forEach((pt, i) => {
-      if (typeof pt.value !== 'number') return;
-      const x = padX + (W * i) / (N - 1) - barW / 2;
-      const y = topPad + H * (1 - (pt.value - yMin) / (yMax - yMin));
-      ctx.fillStyle = '#3498db';
-      ctx.fillRect(x, y, barW, topPad + H - y);
-    });
+    // Bars
+    if (granularity === 'tod' && todSeries) {
+      const todKeys = ['morning','midday','evening','night'];
+      const colors = { morning:'#1f77b4', midday:'#ff7f0e', evening:'#2ca02c', night:'#9467bd' };
+      const groupW = Math.max(8, Math.floor(W / N));
+      const barW = Math.max(4, Math.floor(groupW / (todKeys.length + 1)));
+      todKeys.forEach((tod, k) => {
+        const series = todSeries[tod] || [];
+        series.forEach((pt, i) => {
+          if (typeof pt.value !== 'number') return;
+          const gx = padX + (W * i) / (N - 1) - groupW / 2;
+          const x = gx + k * barW + Math.floor((groupW - todKeys.length * barW) / 2);
+          const y = topPad + H * (1 - (pt.value - yMin) / (yMax - yMin));
+          ctx.fillStyle = colors[tod];
+          ctx.fillRect(x, y, barW, topPad + H - y);
+        });
+      });
+      ctx.fillStyle = '#000';
+      ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      ctx.fillText('Morning | Midday | Evening | Night', padX, 2);
+    } else {
+      const barW = Math.max(6, Math.floor(W / (N * 2)));
+      baseSeries.forEach((pt, i) => {
+        if (typeof pt.value !== 'number') return;
+        const x = padX + (W * i) / (N - 1) - barW / 2;
+        const y = topPad + H * (1 - (pt.value - yMin) / (yMax - yMin));
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect(x, y, barW, topPad + H - y);
+      });
+      ctx.fillStyle = '#000';
+      ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      ctx.fillText('Symptoms (bars)  |  Factor (line)', padX, 2);
+    }
 
-    // Draw line (factor)
+    // Factor line
     ctx.strokeStyle = '#e74c3c';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -231,12 +243,11 @@ export function Reports(root) {
     });
     ctx.stroke();
 
-    // Draw averages (dashed)
+    // Averages
     if (showAvg) {
       ctx.save();
       ctx.setLineDash([6, 6]);
-      // Symptom avg
-      const avg1 = calcAverage(symptomSeries);
+      const avg1 = calcAverage(baseSeries);
       if (typeof avg1 === 'number') {
         const y = topPad + H * (1 - (avg1 - yMin) / (yMax - yMin));
         ctx.strokeStyle = '#3498db';
@@ -245,7 +256,6 @@ export function Reports(root) {
         ctx.lineTo(padX + W, y);
         ctx.stroke();
       }
-      // Factor avg
       const avg2 = calcAverage(factorSeries);
       if (typeof avg2 === 'number') {
         const y = topPad + H * (1 - (avg2 - yMin) / (yMax - yMin));
@@ -259,10 +269,9 @@ export function Reports(root) {
       ctx.restore();
     }
 
-    // Draw trend lines
+    // Trend lines
     if (showTrend) {
-      // Symptom trend
-      const t1 = calcTrendLine(symptomSeries);
+      const t1 = calcTrendLine(baseSeries);
       if (t1) {
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 1.5;
@@ -276,7 +285,6 @@ export function Reports(root) {
         }
         ctx.stroke();
       }
-      // Factor trend
       const t2 = calcTrendLine(factorSeries);
       if (t2) {
         ctx.strokeStyle = '#e74c3c';
@@ -293,20 +301,14 @@ export function Reports(root) {
       }
     }
 
-    // Legend
-    ctx.fillStyle = '#000';
-    ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Symptoms (bars)  |  Factor (line)', padX, 2);
-
-    // Axis labels and sparse date ticks
+    // Date ticks and axis label
     const ticks = Math.min(4, N);
     for (let t = 0; t < ticks; t++) {
       const i = Math.round((t * (N - 1)) / (ticks - 1 || 1));
       const x = padX + (W * i) / (N - 1);
       ctx.fillStyle = '#666';
       ctx.fillRect(x, topPad + H, 1, 4);
-      const label = symptomSeries[i].date?.slice(5); // MM-DD
+      const label = baseSeries[i].date?.slice(5);
       if (label) ctx.fillText(label, Math.max(padX, Math.min(x - 12, padX + W - 24)), topPad + H + 6);
     }
     ctx.save();
@@ -317,7 +319,7 @@ export function Reports(root) {
     ctx.restore();
 
     // Correlation annotation
-    const xy = alignPairs(symptomSeries, factorSeries);
+    const xy = alignPairs(baseSeries, factorSeries);
     let r = null;
     if (xy.length >= 3) {
       r = (corrType === 'spearman') ? spearmanCorr(xy.map(p => p.x), xy.map(p => p.y))
@@ -341,13 +343,8 @@ export function Reports(root) {
   update();
 }
 
-// Utility: Build report data series
+// Build report data series
 export function buildReportSeries({ reportType, lagDays, rangeDays, data, fillGaps = true }) {
-  // reportType: 'intake' | 'sleep' | 'stress'
-  // lagDays: 0..7
-  // rangeDays: how many days back from today (e.g. 14)
-  // data: { [date]: { trackerState, sleep, stress, ... } }
-  // Returns: { symptomSeries: [{date, value}], factorSeries: [{date, value}] }
   const today = new Date();
   const pad = n => n.toString().padStart(2, '0');
   function dateKey(d) {
@@ -360,53 +357,50 @@ export function buildReportSeries({ reportType, lagDays, rangeDays, data, fillGa
     days.push(dateKey(d));
   }
 
-  // For each day, compute average symptom (across times) with optional intraday gap fill
   const TODS = ['morning','midday','evening','night'];
+
+  // Symptoms per day (avg across symptoms), with optional intraday gap fill
+  const todSeries = { morning: [], midday: [], evening: [], night: [] };
   const symptomSeries = days.map(date => {
     const entry = data[date];
-    if (!entry) return { date, value: null };
+    if (!entry) {
+      TODS.forEach(t => todSeries[t].push({ date, value: null }));
+      return { date, value: null };
+    }
     const ts = entry.trackerState || {};
-    // Gather per-time-of-day average symptom score
     const vals = TODS.map(tod => {
       const s = ts[tod]?.symptoms;
       if (!s) return null;
       const nums = Object.values(s).filter(v => typeof v === 'number' && v > 0);
       if (!nums.length) return null;
-      return nums.reduce((a,b) => a + b, 0) / nums.length;
+      return nums.reduce((a,b)=>a+b,0) / nums.length;
     });
     if (fillGaps) {
-      // Single-slot gap fill: if prev and next exist:
       for (let i = 0; i < vals.length; i++) {
-        if (vals[i] == null && i - 1 >= 0 && i + 1 < vals.length && vals[i-1] != null && vals[i+1] != null) {
-          if (vals[i+1] === vals[i-1]) {
-            vals[i] = vals[i-1]; // carry forward last if following is the same
-          } else if (vals[i+1] < vals[i-1]) {
-            vals[i] = vals[i+1]; // carry forward lower if following is lower
-          } // else leave missing when following is higher
+        if (vals[i] == null && i-1>=0 && i+1<vals.length && vals[i-1]!=null && vals[i+1]!=null) {
+          if (vals[i+1] === vals[i-1]) vals[i] = vals[i-1];
+          else if (vals[i+1] < vals[i-1]) vals[i] = vals[i+1];
         }
       }
     }
+    TODS.forEach((t, idx) => todSeries[t].push({ date, value: vals[idx] }));
     const dayNums = vals.filter(v => typeof v === 'number');
     return { date, value: dayNums.length ? (dayNums.reduce((a,b)=>a+b,0) / dayNums.length) : null };
   });
 
-  // For each day, get factor value (intake: sum, sleep/stress: value) with lag applied
+  // Factor series with lag
   const factorSeries = days.map((date, idx) => {
-    // Apply lag: get value from lagDays before
     const lagIdx = idx - lagDays;
     if (lagIdx < 0) return { date, value: null };
     const lagDate = days[lagIdx];
     const entry = data[lagDate];
     if (!entry) return { date, value: null };
     if (reportType === 'intake') {
-      // Sum all intake for the day
       const ts = entry.trackerState || {};
       let sum = 0;
-      ['morning','midday','evening','night'].forEach(tod => {
+      TODS.forEach(tod => {
         const intake = ts[tod]?.intake;
-        if (intake) {
-          Object.values(intake).forEach(v => { if (typeof v === 'number' && v > 0) sum += v; });
-        }
+        if (intake) Object.values(intake).forEach(v => { if (typeof v === 'number' && v > 0) sum += v; });
       });
       return { date, value: sum };
     } else if (reportType === 'sleep') {
@@ -417,17 +411,17 @@ export function buildReportSeries({ reportType, lagDays, rangeDays, data, fillGa
     return { date, value: null };
   });
 
-  return { symptomSeries, factorSeries };
+  return { symptomSeries, factorSeries, todSeries };
 }
 
-// Utility: Average of non-null values
+// Average of non-null values
 export function calcAverage(series) {
   const vals = series.map(pt => pt.value).filter(v => typeof v === 'number');
   if (!vals.length) return null;
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
-// Utility: Simple linear regression (returns {slope, intercept})
+// Simple linear regression
 export function calcTrendLine(series) {
   const pts = series.map((pt, i) => [i, pt.value]).filter(([, v]) => typeof v === 'number');
   const N = pts.length;
@@ -441,7 +435,7 @@ export function calcTrendLine(series) {
   return { slope, intercept };
 }
 
-// Align pairs by index where both values are numeric
+// Helpers
 function alignPairs(s1, s2) {
   const out = [];
   for (let i = 0; i < Math.min(s1.length, s2.length); i++) {
@@ -453,7 +447,6 @@ function alignPairs(s1, s2) {
   return out;
 }
 
-// Pearson correlation
 function pearsonCorr(x, y) {
   const n = Math.min(x.length, y.length);
   if (n < 3) return null;
@@ -468,7 +461,6 @@ function pearsonCorr(x, y) {
   return num / Math.sqrt(dx * dy);
 }
 
-// Spearman rho (rank then Pearson)
 function spearmanCorr(x, y) {
   const n = Math.min(x.length, y.length);
   if (n < 3) return null;
@@ -477,7 +469,6 @@ function spearmanCorr(x, y) {
   return pearsonCorr(rx, ry);
 }
 
-// Average ranks with ties
 function rankify(arr) {
   const entries = arr.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
   const ranks = new Array(arr.length);
@@ -492,7 +483,58 @@ function rankify(arr) {
   return ranks;
 }
 
-// Minimal unit tests (node)
+async function analyzeWithAI({ data, reportType, rangeDays, corrType, granularity, fillGaps }) {
+  try {
+    const key = (typeof localStorage !== 'undefined') ? localStorage.getItem('openai_api_key') : '';
+    if (!key) { alert('OpenAI API key missing. Save it in Settings.'); return; }
+
+    const results = [];
+    for (let lag = 0; lag <= 7; lag++) {
+      const plotted = buildReportSeries({ reportType, lagDays: lag, rangeDays, data, fillGaps });
+      const base = plotted.symptomSeries;
+      const xy = alignPairs(base, plotted.factorSeries);
+      let r = null;
+      if (xy.length >= 3) r = (corrType === 'spearman') ? spearmanCorr(xy.map(p=>p.x), xy.map(p=>p.y)) : pearsonCorr(xy.map(p=>p.x), xy.map(p=>p.y));
+      results.push({ lag, n: xy.length, r });
+    }
+    const best = results.map(r => ({ ...r, abs: (typeof r.r === 'number' && isFinite(r.r)) ? Math.abs(r.r) : -1 }))
+                        .sort((a,b)=>b.abs-a.abs)[0];
+
+    const prompt = [
+      `You are analyzing time series correlations for tinnitus tracking.`,
+      `Report type: ${reportType}. Granularity: ${granularity}. Range: ${rangeDays} days.`,
+      `Correlation metric: ${corrType}. Lags tested: 0..7 days.`,
+      `Top result: lag=${best?.lag}, r=${(typeof best?.r==='number'&&isFinite(best?.r))?best.r.toFixed(3):'n/a'}, n=${best?.n}.`,
+      `All lags summary: ${results.map(r=>`[lag ${r.lag}: r=${(typeof r.r==='number'&&isFinite(r.r))?r.r.toFixed(2):'n/a'}, n=${r.n}]`).join(' ')}.`,
+      `Give 3 concise bullets: likely relationship and direction, practical hypothesis (actionable), and what data to collect next.`
+    ].join('\n');
+
+    const body = {
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are an expert data analyst for personal health time-series. Be concise and practical.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.2,
+      max_tokens: 300
+    };
+
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) throw new Error(`OpenAI error ${resp.status}`);
+    const json = await resp.json();
+    const text = json?.choices?.[0]?.message?.content?.trim() || 'No response';
+    alert(text);
+  } catch (e) {
+    console.error(e);
+    alert('AI analysis failed: ' + (e?.message || e));
+  }
+}
+
+// Minimal unit tests
 if (typeof window === 'undefined' || window.TEST_REPORTS) {
   const s = [ {value:1}, {value:2}, {value:3}, {value:null}, {value:5} ];
   console.log('Test calcAverage:', calcAverage(s));
