@@ -3,6 +3,7 @@ import { TrackerRow } from './components/TrackerRow.js';
 import { WaterButton } from './components/WaterButton.js';
 import { DebugPanel } from './components/DebugPanel.js';
 import { SettingsModal } from './components/SettingsModal.js';
+import { Reports } from './components/Reports.js';
 import { loadData, saveData, exportData, importData } from './storage.js';
 
 const STORAGE_KEY = 'ear-tracker-data';
@@ -44,6 +45,7 @@ let allData = loadData() || {};
 let selectedDate = getTodayKey();
 let currentTab = getCurrentTab();
 let settingsOpen = false;
+let reportsVisible = false; // Track if reports section is shown
 
 function getDayData(dateKey) {
   if (!allData[dateKey]) {
@@ -104,6 +106,7 @@ function handleImport() {
         selectedDate = getTodayKey();
         currentTab = getCurrentTab();
         settingsOpen = false;
+        window.allData = allData;
         render();
       } else {
         alert('Import failed: invalid JSON');
@@ -117,6 +120,27 @@ function handleImport() {
 function render() {
   const app = document.getElementById('app');
   app.innerHTML = '';
+
+  // --- Reports Button ---
+  const reportsBtn = document.createElement('button');
+  reportsBtn.textContent = reportsVisible ? 'Hide Reports' : 'Show Reports';
+  reportsBtn.style.margin = '12px 0 8px 0';
+  reportsBtn.style.padding = '8px 16px';
+  reportsBtn.style.fontSize = '1rem';
+  reportsBtn.onclick = () => {
+    reportsVisible = !reportsVisible;
+    render();
+  };
+  app.appendChild(reportsBtn);
+
+  // --- Reports Root Placeholder ---
+  if (reportsVisible) {
+    const reportsRoot = document.createElement('div');
+    reportsRoot.id = 'reports-root';
+    reportsRoot.style.margin = '16px 0';
+    app.appendChild(reportsRoot);
+    Reports(reportsRoot);
+  }
 
   // Top bar for date and water intake
   const topBar = document.createElement('div');
@@ -210,6 +234,14 @@ function render() {
 
   topBar.appendChild(waterWrap);
   topBar.appendChild(dateWrap);
+
+  // Settings button
+  const settingsBtn = document.createElement('button');
+  settingsBtn.textContent = 'Settings';
+  settingsBtn.style.padding = '6px 12px';
+  settingsBtn.style.marginLeft = '8px';
+  settingsBtn.onclick = () => { settingsOpen = true; render(); };
+  topBar.appendChild(settingsBtn);
 
   app.appendChild(topBar);
 
@@ -333,8 +365,6 @@ function render() {
   const debug = DebugPanel({ storageKey: STORAGE_KEY, activeTab: currentTab });
   app.appendChild(debug);
 
-  // Cogwheel button at bottom
-  const cog = document.createElement('button');
   // Settings modal
   const modal = SettingsModal({
     open: settingsOpen,
@@ -350,5 +380,7 @@ window.onload = () => {
   selectedDate = getTodayKey();
   currentTab = getCurrentTab();
   settingsOpen = false;
+  reportsVisible = false;
+  window.allData = allData;
   render();
 };

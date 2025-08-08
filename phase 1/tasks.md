@@ -60,6 +60,6 @@ Each task is focused, testable, and bundles related concerns for faster implemen
 - [x] Test: App loads offline after first visit; can be added to home screen and launches standalone
 
 ## 10. Polish & Review
-- [ ] Review UI for mobile usability
+- [x] Review UI for mobile usability
 - [ ] Remove/disable debug panel for production
 - [ ] Final test: Full manual walkthrough of all features 

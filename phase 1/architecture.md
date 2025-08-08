@@ -7,7 +7,6 @@ A simple Progressive Web App (PWA) for tracking ear symptoms and external factor
 
 ## File & Folder Structure
 
-```
 ear-tracker/
 │
 ├── index.html            # Main HTML entry point
@@ -25,25 +24,6 @@ ear-tracker/
 │   │   └── DebugPanel.js     # Shows local storage for dev
 │   └── styles.css        # All app styles
 └── README.md             # Project info
-```
-
----
-
-## What Each Part Does
-
-- **index.html**: Loads the app, root for mounting UI, links manifest and styles.
-- **manifest.json**: PWA metadata (icon, name, etc).
-- **service-worker.js**: Enables offline use, caches assets.
-- **/src/app.js**: Main entry. Initializes app, manages global state, handles tab switching, date switching, and coordinates between UI and storage.
-- **/src/storage.js**: Abstracts all localStorage access. Handles saving, loading, exporting, and importing data as JSON.
-- **/src/ui.js**: Renders UI, attaches event listeners, updates DOM on state changes.
-- **/src/components/**: Small, focused UI modules:
-    - **Tabs.js**: Renders and manages time-of-day tab navigation.
-    - **TrackerRow.js**: Renders a label and 5 radio buttons for each tracked value.
-    - **WaterButton.js**: Button to add 200ml water, updates daily sum.
-    - **SettingsModal.js**: Cogwheel-triggered modal for import/export.
-    - **DebugPanel.js**: Shows raw localStorage for dev/debugging.
-- **/src/styles.css**: All app styles (mobile-first, simple, responsive).
 
 ---
 

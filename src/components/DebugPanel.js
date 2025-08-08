@@ -9,6 +9,12 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
 
   // Will append SW status later inside panel
   let swStatusText = 'Service Worker: checking...';
+  function setStatus(text) {
+    swStatusText = text;
+    if (statusBlock) {
+      statusBlock.textContent = `${swStatusText} | Active tab: ${activeTab}`;
+    }
+  }
 
   // Detailed SW debug info
   const swDebug = document.createElement('div');
@@ -42,20 +48,20 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration().then(reg => {
         if (!reg) {
-          swStatusText = 'Service Worker: not registered';
+          setStatus('Service Worker: not registered');
           updateSWDebug(null);
         } else if (reg.active) {
-          swStatusText = 'Service Worker: active';
+          setStatus('Service Worker: active');
           updateSWDebug(reg);
         } else if (reg.installing) {
-          swStatusText = 'Service Worker: installing...';
+          setStatus('Service Worker: installing...');
           updateSWDebug(reg);
         } else {
-          swStatusText = 'Service Worker: registered (not active)';
+          setStatus('Service Worker: registered (not active)');
           updateSWDebug(reg);
         }
       }).catch(err => {
-        swStatusText = 'Service Worker: error';
+        setStatus('Service Worker: error');
         updateSWDebug(null, err);
       });
       navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -71,7 +77,7 @@ export function DebugPanel({ storageKey, activeTab = '' }) {
         updateSWDebug(null, e);
       });
     } else {
-      swStatusText = 'Service Worker: not supported';
+      setStatus('Service Worker: not supported');
       updateSWDebug(null);
     }
   }, 0);
