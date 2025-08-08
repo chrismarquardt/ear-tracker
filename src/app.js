@@ -106,6 +106,7 @@ function handleImport() {
         selectedDate = getTodayKey();
         currentTab = getCurrentTab();
         settingsOpen = false;
+        window.allData = allData;
         render();
       } else {
         alert('Import failed: invalid JSON');
@@ -234,6 +235,14 @@ function render() {
   topBar.appendChild(waterWrap);
   topBar.appendChild(dateWrap);
 
+  // Settings button
+  const settingsBtn = document.createElement('button');
+  settingsBtn.textContent = 'Settings';
+  settingsBtn.style.padding = '6px 12px';
+  settingsBtn.style.marginLeft = '8px';
+  settingsBtn.onclick = () => { settingsOpen = true; render(); };
+  topBar.appendChild(settingsBtn);
+
   app.appendChild(topBar);
 
   // Visually delimited tab area
@@ -356,8 +365,6 @@ function render() {
   const debug = DebugPanel({ storageKey: STORAGE_KEY, activeTab: currentTab });
   app.appendChild(debug);
 
-  // Cogwheel button at bottom
-  const cog = document.createElement('button');
   // Settings modal
   const modal = SettingsModal({
     open: settingsOpen,
@@ -374,5 +381,6 @@ window.onload = () => {
   currentTab = getCurrentTab();
   settingsOpen = false;
   reportsVisible = false;
+  window.allData = allData;
   render();
 };
